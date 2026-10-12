@@ -1,0 +1,602 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUESS — Number Game</title>
+
+    <style>
+        :root {
+            --black: #080808;
+            --white: #f5f5f0;
+            --gray: #a5a5a0;
+            --line: #383838;
+            --panel: #111111;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            color-scheme: dark;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 28px;
+            background: var(--black);
+            color: var(--white);
+            font-family: Arial, Helvetica, sans-serif;
+            animation: appear 0.7s ease both;
+        }
+
+        button, input, select {
+            font: inherit;
+        }
+
+        .page {
+            max-width: 1240px;
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .logo {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: #777;
+        }
+
+        .edition {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        /* MAIN LAYOUT */
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 24px;
+            margin-top: 32px;
+            align-items: stretch;
+        }
+
+        .intro {
+            min-height: 550px;
+            padding: clamp(24px, 5vw, 60px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: var(--white);
+            color: var(--black);
+            animation: slide-in 0.7s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        .number-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+
+        h1 {
+            margin: 44px 0 24px;
+            font-size: clamp(64px, 9vw, 130px);
+            font-weight: 900;
+            line-height: 0.76;
+            letter-spacing: -0.095em;
+        }
+
+        h1 span {
+            display: block;
+            margin-top: 16px;
+            color: #777;
+        }
+
+        .intro-text {
+            max-width: 310px;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .intro-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 18px;
+            border-top: 2px solid #111;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .big-arrow {
+            font-size: 36px;
+            transition: transform 0.3s ease;
+        }
+
+        .intro:hover .big-arrow {
+            transform: translate(5px, -5px);
+        }
+
+        /* GAME PANEL */
+
+        .game {
+            min-width: 0;
+            padding: clamp(22px, 3vw, 38px);
+            display: flex;
+            flex-direction: column;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            animation: slide-in 0.7s 0.12s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        .game-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .game-top strong {
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+
+        .live {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--gray);
+            font-size: 9px;
+            letter-spacing: 1px;
+        }
+
+        .live::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: var(--white);
+            border-radius: 50%;
+            animation: blink 1.8s infinite;
+        }
+
+        .heading {
+            margin-top: 32px;
+            font-size: 12px;
+            color: var(--gray);
+            letter-spacing: 2px;
+        }
+
+        .game h2 {
+            margin: 9px 0;
+            font-size: clamp(29px, 4vw, 44px);
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .description {
+            margin: 0 0 24px;
+            color: var(--gray);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            min-height: 52px;
+            padding: 14px;
+            border: 1px solid #484848;
+            border-radius: 0;
+            outline: none;
+            background: #090909;
+            color: var(--white);
+            font-size: 14px;
+            transition: border-color 0.25s, background 0.25s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: var(--white);
+            background: #181818;
+        }
+
+        .field {
+            margin-top: 22px;
+        }
+
+        button {
+            width: 100%;
+            min-height: 54px;
+            margin-top: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--white);
+            border-radius: 0;
+            background: var(--white);
+            color: var(--black);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: background 0.25s, color 0.25s,
+                        transform 0.25s, padding 0.25s;
+        }
+
+        button:hover {
+            padding-left: 20px;
+            padding-right: 20px;
+            background: transparent;
+            color: var(--white);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .button-arrow {
+            font-size: 19px;
+            transition: transform 0.25s;
+        }
+
+        button:hover .button-arrow {
+            transform: translateX(4px);
+        }
+
+        .secondary {
+            background: transparent;
+            color: var(--white);
+            border-color: #555;
+        }
+
+        .secondary:hover {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        /* STATS */
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 4px 0 6px;
+        }
+
+        .stat {
+            padding: 17px 13px;
+            border: 1px solid var(--line);
+            transition: background 0.25s, transform 0.25s;
+        }
+
+        .stat:hover {
+            background: #1c1c1c;
+            transform: translateY(-3px);
+        }
+
+        .stat small {
+            display: block;
+            margin-bottom: 13px;
+            color: var(--gray);
+            font-size: 9px;
+            letter-spacing: 1px;
+        }
+
+        .stat strong {
+            font-size: 26px;
+            letter-spacing: -1px;
+        }
+
+        .stat strong span {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .status {
+            margin-top: 22px;
+            padding: 15px;
+            border: 1px solid #4c4c4c;
+            background: #1a1a1a;
+            font-size: 13px;
+            line-height: 1.7;
+            animation: message-in 0.35s ease both;
+        }
+
+        .status.success {
+            background: var(--white);
+            color: var(--black);
+            border-color: var(--white);
+        }
+
+        .status.error {
+            border-left: 4px solid #aaa;
+        }
+
+        .game-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            color: #777;
+            font-size: 9px;
+            letter-spacing: 1px;
+        }
+
+        /* BOTTOM BAR */
+
+        .bottom {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+            color: #777;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        @keyframes appear {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes message-in {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 18px;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .intro {
+                min-height: 380px;
+            }
+
+            h1 {
+                font-size: clamp(70px, 17vw, 110px);
+            }
+
+            .game {
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            body {
+                padding: 12px;
+            }
+
+            .edition {
+                font-size: 8px;
+                letter-spacing: 1px;
+            }
+
+            .intro, .game {
+                padding: 22px;
+            }
+
+            .bottom {
+                font-size: 8px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+
+        <header>
+            <div class="logo">GG<span>®</span> / STUDIO</div>
+            <div class="edition">INTERACTIVE PROJECT — 001</div>
+        </header>
+
+        <div class="layout">
+
+            <section class="intro">
+                <div>
+                    <div class="number-label">NO. 001 — THE CHALLENGE</div>
+
+                    <h1>GUESS<span>THE</span>NUMBER.</h1>
+
+                    <p class="intro-text">
+                        One hidden number. Ten attempts.
+                        A battle between logic and luck.
+                        Can you find it?
+                    </p>
+                </div>
+
+                <div class="intro-bottom">
+                    <span>THINK CLEAR. GUESS SMART.</span>
+                    <span class="big-arrow">↘</span>
+                </div>
+            </section>
+
+            <section class="game">
+                <div class="game-top">
+                    <strong>GAME CONSOLE</strong>
+                    <span class="live">SYSTEM READY</span>
+                </div>
+
+                {% if not playing and not won and attempts == 0 %}
+                <div class="heading">01 / INITIALIZE</div>
+                <h2>Choose your<br>difficulty.</h2>
+                <p class="description">
+                    Pick a range and test your instincts.
+                </p>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="start">
+
+                    <div class="field">
+                        <label for="difficulty">DIFFICULTY LEVEL</label>
+                        <select name="difficulty" id="difficulty">
+                            <option value="easy">EASY / 01—20</option>
+                            <option value="medium">MEDIUM / 01—50</option>
+                            <option value="hard">HARD / 01—100</option>
+                        </select>
+                    </div>
+
+                    <button type="submit">
+                        START GAME <span class="button-arrow">↗</span>
+                    </button>
+                </form>
+                {% endif %}
+
+                {% if playing %}
+                <div class="heading">02 / ACTIVE ROUND</div>
+                <h2>Find the<br>number.</h2>
+                <p class="description">
+                    Enter your guess below. Every attempt counts.
+                </p>
+
+                <div class="stats">
+                    <div class="stat">
+                        <small>ATTEMPTS USED</small>
+                        <strong>{{ attempts }}<span>/{{ max_attempts }}</span></strong>
+                    </div>
+                    <div class="stat">
+                        <small>NUMBER RANGE</small>
+                        <strong>1<span>—</span>{{ max_number }}</strong>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="guess">
+
+                    <div class="field">
+                        <label for="guess">YOUR GUESS</label>
+                        <input
+                            type="number"
+                            name="guess"
+                            id="guess"
+                            min="1"
+                            max="{{ max_number }}"
+                            placeholder="ENTER NUMBER..."
+                            required
+                            autofocus
+                        >
+                    </div>
+
+                    <button type="submit">
+                        SUBMIT GUESS <span class="button-arrow">↗</span>
+                    </button>
+                </form>
+                {% endif %}
+
+                {% if message %}
+                <div class="status {{ message_type }}" role="status" aria-live="polite">
+                    {{ message }}
+                </div>
+                {% endif %}
+
+                {% if not playing and (won or attempts > 0) %}
+                <div class="heading">03 / ROUND COMPLETE</div>
+                <h2>{% if won %}YOU WON.{% else %}GAME OVER.{% endif %}</h2>
+                <p class="description">
+                    {% if won %}
+                    Excellent work. You found the hidden number.
+                    {% else %}
+                    The round is over. Ready to try again?
+                    {% endif %}
+                </p>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="restart">
+                    <input type="hidden" name="difficulty" value="{{ difficulty }}">
+
+                    <button type="submit">
+                        PLAY AGAIN <span class="button-arrow">↻</span>
+                    </button>
+                </form>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="start">
+                    <input type="hidden" name="difficulty" value="{{ difficulty }}">
+
+                    <button type="submit" class="secondary">
+                        SAME DIFFICULTY <span class="button-arrow">↗</span>
+                    </button>
+                </form>
+                {% endif %}
+
+                <div class="game-footer">
+                    BUILT WITH PYTHON + FLASK
+                </div>
+            </section>
+
+        </div>
+
+        <footer class="bottom">
+            <span>BLACK / WHITE / LOGIC</span>
+            <span>DESIGNED TO THINK DIFFERENTLY.</span>
+        </footer>
+    </main>
+</body>
+</html>
